@@ -131,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, "/cambiarPassword");
+                    Navigator.pushNamed(context, "/cambiarcontraseña");
                   },
                   child: const Text(
                     "¿Olvidaste tu contraseña?",

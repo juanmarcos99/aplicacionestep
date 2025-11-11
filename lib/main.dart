@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart'; // Importo la pantalla de login
 import 'screens/paciente_screen.dart';
 import 'screens/doctor_screen.dart';
+import 'screens/cambiar_contrasena_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginScreen(),
         '/paciente': (context) => const PacienteScreen(),
         '/doctor': (context) => const DoctorScreen(),
-        //'/cambiarPassword': (context) => const CambiarPasswordScreen(),
+        '/cambiarcontraseña': (context) => const CambiarContrasenaScreen(),
       },
     );
   }
