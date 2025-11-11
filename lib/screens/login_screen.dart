@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import '../database/db_helper.dart';
 
-// Pantalla de inicio de sesión minimalista y profesional.
-// Aquí el usuario escribe su usuario y contraseña, con un diseño limpio.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -10,14 +9,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _obscurePassword = true; // Controla visibilidad de contraseña
-  final TextEditingController _userController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+  final _userController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fondo limpio
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -25,19 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Título principal
                 Text(
-                  "logIn",
+                  "Epilepsia App",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF2E7D7D), // Color clínico
+                    color: const Color(0xFF2E7D7D),
                   ),
                 ),
                 const SizedBox(height: 40),
 
-                // Campo de usuario
                 TextField(
                   controller: _userController,
                   decoration: InputDecoration(
@@ -52,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Campo de contraseña
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -66,9 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
                         color: Colors.grey.shade600,
                       ),
                       onPressed: () {
@@ -81,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Botón de acceso
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2E7D7D),
@@ -90,24 +83,58 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
-                    // Aquí luego validaremos contra la base de datos
-                    Navigator.pushNamed(context, "/paciente");
+                  onPressed: () async {
+                    // Capturo el context actual en una variable local
+                    final ctx = context;
+
+                    // Valido usuario y contraseña contra la BD
+                    final ok = await DBHelper.validateLogin(
+                      _userController.text,
+                      _passwordController.text,
+                    );
+
+                    // Verifico que el widget sigue montado
+                    if (!mounted) return;
+
+                    if (ok) {
+                      if (_userController.text.trim() == "Paciente") {
+                        // ignore: use_build_context_synchronously
+                        Navigator.pushNamed(ctx, "/paciente");
+                      } else if (_userController.text.trim() == "Doctor") {
+                        // ignore: use_build_context_synchronously
+                        Navigator.pushNamed(ctx, "/doctor");
+                      }
+                    } else {
+                      showDialog(
+                        // ignore: use_build_context_synchronously
+                        context: ctx,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Error de acceso"),
+                          content: const Text("Usuario o contraseña incorrectos."),
+                          actions: [
+                            TextButton(
+                              child: const Text("OK"),
+                              onPressed: () => Navigator.pop(ctx),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     "Acceder",
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
-                // Enlace cambiar contraseña
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, "/cambiarPassword");
                   },
                   child: const Text(
-                    "Cambiar contraseña",
+                    "¿Olvidaste tu contraseña?",
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
