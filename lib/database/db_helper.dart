@@ -26,13 +26,13 @@ class DBHelper {
           )
         ''');
 
-        // Inserto usuarios iniciales: Paciente (1234) y Doctor (5678)
+        // Inserto usuarios iniciales en minúsculas
         await db.insert("users", {
-          "username": "Paciente",
+          "username": "paciente",
           "passwordHash": _hashPassword("1234"),
         });
         await db.insert("users", {
-          "username": "Doctor",
+          "username": "doctor",
           "passwordHash": _hashPassword("5678"),
         });
       },
@@ -45,28 +45,28 @@ class DBHelper {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-   // Validar login
+  // Validar login (ignora mayúsculas/minúsculas)
   static Future<bool> validateLogin(String username, String password) async {
     final db = await initDb();
     final hashed = _hashPassword(password);
 
     final res = await db.query(
       "users",
-      where: "username = ? AND passwordHash = ?",
-      whereArgs: [username.trim(), hashed],
+      where: "LOWER(username) = ? AND passwordHash = ?",
+      whereArgs: [username.trim().toLowerCase(), hashed],
       limit: 1,
     );
     return res.isNotEmpty;
   }
 
-  // Cambiar contraseña
+  // Cambiar contraseña (también normaliza el usuario)
   static Future<int> changePassword(String username, String newPassword) async {
     final db = await initDb();
     return await db.update(
       "users",
       {"passwordHash": _hashPassword(newPassword)},
-      where: "username = ?",
-      whereArgs: [username.trim()],
+      where: "LOWER(username) = ?",
+      whereArgs: [username.trim().toLowerCase()],
     );
   }
 }

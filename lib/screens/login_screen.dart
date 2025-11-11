@@ -15,131 +15,122 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const Color primaryColor = Color(0xFF26A69A);
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  "Epilepsia App",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF2E7D7D),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.medical_services_outlined,
+                  size: 80, color: primaryColor),
+              const SizedBox(height: 20),
+              const Text(
+                "Epilepsia App",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 40),
+
+              // Campo Usuario
+              TextField(
+                controller: _userController,
+                decoration: const InputDecoration(
+                  labelText: "Usuario",
+                  prefixIcon: Icon(Icons.person_outline),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Campo Contraseña
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  labelText: "Contraseña",
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey.shade600,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                 ),
-                const SizedBox(height: 40),
+              ),
+              const SizedBox(height: 30),
 
-                TextField(
-                  controller: _userController,
-                  decoration: InputDecoration(
-                    labelText: "Usuario",
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
+              // Botón Acceder
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final ctx = context;
+                  final ok = await DBHelper.validateLogin(
+                    _userController.text,
+                    _passwordController.text,
+                  );
 
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: "Contraseña",
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey.shade600,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
+                  if (!mounted) return;
 
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2E7D7D),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () async {
-                    // Capturo el context actual en una variable local
-                    final ctx = context;
-
-                    // Valido usuario y contraseña contra la BD
-                    final ok = await DBHelper.validateLogin(
-                      _userController.text,
-                      _passwordController.text,
-                    );
-
-                    // Verifico que el widget sigue montado
-                    if (!mounted) return;
-
-                    if (ok) {
-                      if (_userController.text.trim() == "Paciente") {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushNamed(ctx, "/paciente");
-                      } else if (_userController.text.trim() == "Doctor") {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushNamed(ctx, "/doctor");
-                      }
-                    } else {
-                      showDialog(
-                        // ignore: use_build_context_synchronously
-                        context: ctx,
-                        builder: (_) => AlertDialog(
-                          title: const Text("Error de acceso"),
-                          content: const Text("Usuario o contraseña incorrectos."),
-                          actions: [
-                            TextButton(
-                              child: const Text("OK"),
-                              onPressed: () => Navigator.pop(ctx),
-                            ),
-                          ],
-                        ),
-                      );
+                  if (ok) {
+                    if (_userController.text.trim().toLowerCase() == "paciente") {
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushNamed(ctx, "/paciente");
+                    } else if (_userController.text.trim().toLowerCase() == "doctor") {
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushNamed(ctx, "/doctor");
                     }
-                  },
-                  child: const Text(
-                    "Acceder",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                  } else {
+                    showDialog(
+                      // ignore: use_build_context_synchronously
+                      context: ctx,
+                      builder: (_) => AlertDialog(
+                        title: const Text("Error de acceso"),
+                        content: const Text("Usuario o contraseña incorrectos."),
+                        actions: [
+                          TextButton(
+                            child: const Text("OK"),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.login),
+                label: const Text("Entrar"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
+              ),
+              const SizedBox(height: 20),
 
-                const SizedBox(height: 20),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/cambiarcontraseña");
-                  },
-                  child: const Text(
-                    "¿Olvidaste tu contraseña?",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+              // Botón cambiar contraseña
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/cambiarcontrasena");
+                },
+                child: const Text(
+                  "¿Olvidaste tu contraseña?",
+                  style: TextStyle(color: primaryColor),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

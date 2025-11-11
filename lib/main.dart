@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginScreen(),
         '/paciente': (context) => const PacienteScreen(),
         '/doctor': (context) => const DoctorScreen(),
-        '/cambiarcontraseña': (context) => const CambiarContrasenaScreen(),
+        '/cambiarcontrasena': (context) => const CambiarContrasenaScreen(),
       },
     );
   }
