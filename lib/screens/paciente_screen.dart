@@ -4,6 +4,16 @@ class PacienteScreen extends StatelessWidget {
   const PacienteScreen({super.key});
 
   final List<String> options = const [
+    '/registro_crisis',             // Registro de Crisis
+    '/registro_evento_adverso',
+    '/diario_crisis',
+    '/diario_eventos',
+    '/alertas',
+    '/educacion',
+    '/configuracion',
+  ];
+
+  final List<String> labels = const [
     'Registro de Crisis',
     'Registro de Eventos Adversos',
     'Diario de Crisis',
@@ -14,13 +24,13 @@ class PacienteScreen extends StatelessWidget {
   ];
 
   final List<IconData> icons = const [
-    Icons.add_alert_outlined,               // Registro de Crisis
-    Icons.sentiment_dissatisfied_outlined,  // Registro de Eventos Adversos
-    Icons.calendar_today_outlined,          // Diario de Crisis
-    Icons.event_note_outlined,              // Diario de Eventos Adversos
-    Icons.notifications_active_outlined,    // Alertas
-    Icons.info_outline,                     // Conoce mejor tu enfermedad
-    Icons.settings_outlined,                // Configuración
+    Icons.add_alert_outlined,
+    Icons.sentiment_dissatisfied_outlined,
+    Icons.calendar_today_outlined,
+    Icons.event_note_outlined,
+    Icons.notifications_active_outlined,
+    Icons.info_outline,
+    Icons.settings_outlined,
   ];
 
   @override
@@ -60,11 +70,11 @@ class PacienteScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return ElevatedButton.icon(
                     onPressed: () {
-                      // Acción vacía para evitar errores
+                      Navigator.pushNamed(context, options[index]);
                     },
                     icon: Icon(icons[index], size: 24, color: Colors.white),
                     label: Text(
-                      options[index],
+                      labels[index],
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
