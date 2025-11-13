@@ -1,3 +1,4 @@
+import 'package:aplicacionestep/screens/diario_crisis_screen.dart';
 import 'package:aplicacionestep/screens/registro_crisis_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart'; // Importo la pantalla de login
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         '/doctor': (context) => const DoctorScreen(),
         '/cambiarcontrasena': (context) => const CambiarContrasenaScreen(),
         "/registro_crisis": (context) => const RegistroCrisisScreen(),
+        "/diario_crisis": (context) => const DiarioCrisisScreen(),
       },
     );
   }
