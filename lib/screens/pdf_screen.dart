@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../database/crisis_dao.dart';
 import '../database/crisis_detalle_dao.dart';
 import '../models/crisis.dart';
 import '../models/crisis_detalle.dart';
-import '../utils/pdf_generator.dart'; // 👈 tu helper
+import '../utils/pdf_generator.dart';
 
 class PdfScreen extends StatefulWidget {
   const PdfScreen({super.key});
@@ -82,6 +83,18 @@ class _PdfScreenState extends State<PdfScreen> {
     }
   }
 
+  /// 📂 Nuevo método: abrir carpeta de PDFs
+  Future<void> abrirCarpetaPDFs() async {
+    final dir = await getExternalStorageDirectory();
+    if (dir != null) {
+      await OpenFilex.open(dir.path);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No se pudo acceder a la carpeta de PDFs")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF26A69A);
@@ -91,6 +104,13 @@ class _PdfScreenState extends State<PdfScreen> {
         title: const Text("Generar PDF"),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.folder),
+            tooltip: "Abrir carpeta de PDFs",
+            onPressed: abrirCarpetaPDFs,
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFE6F4F1),
       body: SingleChildScrollView(
