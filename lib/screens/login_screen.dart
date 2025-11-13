@@ -1,5 +1,5 @@
+import 'package:aplicacionestep/database/user_dao.dart';
 import 'package:flutter/material.dart';
-import '../database/db_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ElevatedButton.icon(
                 onPressed: () async {
                   final ctx = context;
-                  final ok = await DBHelper.validateLogin(
+                  final ok = await UserDao.validateLogin(
                     _userController.text,
                     _passwordController.text,
                   );

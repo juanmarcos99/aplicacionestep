@@ -1,5 +1,5 @@
+import 'package:aplicacionestep/database/user_dao.dart';
 import 'package:flutter/material.dart';
-import '../database/db_helper.dart';
 
 class CambiarContrasenaScreen extends StatefulWidget {
   const CambiarContrasenaScreen({super.key});
@@ -149,11 +149,11 @@ class _CambiarContrasenaScreenState extends State<CambiarContrasenaScreen> {
                     return;
                   }
 
-                  final valid = await DBHelper.validateLogin(user, currentPass);
+                  final valid = await UserDao.validateLogin(user, currentPass);
                   if (!mounted) return;
 
                   if (valid) {
-                    await DBHelper.changePassword(user, newPass);
+                    await UserDao.changePassword(user, newPass);
                     showDialog(
                       // ignore: use_build_context_synchronously
                       context: context,
