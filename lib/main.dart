@@ -1,4 +1,5 @@
 import 'package:aplicacionestep/screens/diario_crisis_screen.dart';
+import 'package:aplicacionestep/screens/pdf_list_screen.dart';
 import 'package:aplicacionestep/screens/pdf_screen.dart';
 import 'package:aplicacionestep/screens/registro_crisis_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         "/registro_crisis": (context) => const RegistroCrisisScreen(),
         "/diario_crisis": (context) => const DiarioCrisisScreen(),
         '/pdf': (context) => const PdfScreen(),
+        '/pdfs': (context) => const PdfListScreen(),
       },
     );
   }

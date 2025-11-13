@@ -68,6 +68,8 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   child: ListTile(
                     leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                     title: Text(nombre),
+                    // 👇 Aquí se abre el PDF al tocar el ListTile
+                    onTap: () => abrirPDF(file),
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'abrir') {
