@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:aplicacionestep/database/crisis_dao.dart';
 import 'package:aplicacionestep/database/crisis_detalle_dao.dart';
 import 'package:aplicacionestep/models/crisis_detalle.dart';
+import 'pdf_screen.dart'; // 👈 Importa la nueva pantalla
 
 class DiarioCrisisScreen extends StatefulWidget {
   const DiarioCrisisScreen({super.key});
@@ -14,7 +15,6 @@ class DiarioCrisisScreen extends StatefulWidget {
 class _DiarioCrisisScreenState extends State<DiarioCrisisScreen> {
   DateTime fechaSeleccionada = DateTime.now();
 
-  // Mapa: horario -> lista de detalles
   Map<String, List<CrisisDetalle>> crisisPorHorario = {};
 
   @override
@@ -40,10 +40,8 @@ class _DiarioCrisisScreenState extends State<DiarioCrisisScreen> {
   Future<void> cargarDatos() async {
     final fechaTexto = DateFormat('yyyy-MM-dd').format(fechaSeleccionada);
 
-    // 1. Obtener crisis del día
     final crisisList = await CrisisDao.getAllCrisis();
 
-    // 👇 Convertimos el DateTime de cada crisis a String antes de comparar
     final crisisDelDia = crisisList.where((c) {
       final fechaCrisisTexto = DateFormat('yyyy-MM-dd').format(c.fechaCrisis);
       return fechaCrisisTexto == fechaTexto;
@@ -51,7 +49,6 @@ class _DiarioCrisisScreenState extends State<DiarioCrisisScreen> {
 
     Map<String, List<CrisisDetalle>> agrupados = {};
 
-    // 2. Obtener detalles de cada crisis
     for (var crisis in crisisDelDia) {
       final detalles = await CrisisDetalleDao.getDetallesByCrisis(crisis.id!);
       for (var d in detalles) {
@@ -75,21 +72,31 @@ class _DiarioCrisisScreenState extends State<DiarioCrisisScreen> {
         title: const Text('Diario de Crisis'),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
+        actions: [
+          // 📌 Botón PDF en el AppBar que navega a PdfScreen
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+            tooltip: "Exportar a PDF",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PdfScreen()),
+              );
+            },
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFE6F4F1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // ---------------- Fecha seleccionada ----------------
             ListTile(
               title: Text('Fecha seleccionada: $fechaTexto'),
               trailing: const Icon(Icons.calendar_today, color: primaryColor),
               onTap: seleccionarFecha,
             ),
             const SizedBox(height: 20),
-
-            // ---------------- Lista de crisis agrupadas ----------------
             Expanded(
               child: crisisPorHorario.isEmpty
                   ? const Center(
