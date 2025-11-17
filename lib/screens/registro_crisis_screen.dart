@@ -91,28 +91,23 @@ class _RegistroCrisisScreenState extends State<RegistroCrisisScreen> {
   Future<void> guardarCrisis() async {
     if (!mounted) return;
     if (horario == null) {
-      //verifica si hay horario seleccionado
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Selecciona un horario")));
       return;
     }
 
-    setState(() => _isLoading = true); //empieza la carga
+    setState(() => _isLoading = true);
 
     try {
-      // 1. Insertar crisis principal
-      final crisis = Crisis(fechaCrisis: fecha, fechaRegistro: DateTime.now());
-      final crisisId = await CrisisDao.insertCrisis(crisis);
-
-      // Inserto detalles de la crisis (cirsisDetalle). Verifico q hay al menos un campo lleno
+      // 1. Validar detalles fijos
       final detalles = <CrisisDetalle>[];
       for (var tipo in tiposCrisis) {
         final valor = crisisControllers[tipo]!.text.trim();
         if (valor.isNotEmpty) {
           detalles.add(
             CrisisDetalle(
-              crisisId: crisisId,
+              crisisId: 0, // se asignará luego
               horario: sanitizeText(horario!),
               tipo: sanitizeText(tipo),
               cantidad: int.tryParse(valor) ?? 0,
@@ -122,59 +117,63 @@ class _RegistroCrisisScreenState extends State<RegistroCrisisScreen> {
       }
 
       if (detalles.isEmpty) {
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Debes llenar al menos un campo")),
+          const SnackBar(content: Text("Debes llenar al menos un campo fijo")),
         );
         return;
       }
 
-      for (var detalle in detalles) {
-        await CrisisDetalleDao.insertDetalle(detalle);
-      }
-
-      //Insertar crisis dinamicas (crisisDetalles)
+      // 2. Validar detalles dinámicos
       final dinamicos = <CrisisDetalle>[];
-      bool dinamicoLleno = true;
       for (var campo in otrosCampos) {
         final descripcion = campo['descripcion']!.text.trim();
         final cantidad = campo['cantidad']!.text.trim();
         if (descripcion.isNotEmpty && cantidad.isNotEmpty) {
-          final detalle = CrisisDetalle(
-            crisisId: crisisId,
-            horario: sanitizeText(horario!),
-            tipo: sanitizeText(descripcion),
-            cantidad: int.tryParse(cantidad) ?? 0,
+          dinamicos.add(
+            CrisisDetalle(
+              crisisId: 0, // se asignará luego
+              horario: sanitizeText(horario!),
+              tipo: sanitizeText(descripcion),
+              cantidad: int.tryParse(cantidad) ?? 0,
+            ),
           );
-          dinamicos.add(detalle);
         } else {
-          dinamicoLleno = false;
-          break;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Debes llenar todos los campos de las crisis añadidas",
+              ),
+            ),
+          );
+          return;
         }
       }
-      // pregunto si todos los datos de las crisis dinamicas estan llenos
-      if (!dinamicoLleno) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Debes llenar todos los campos de las crisis añadidas",
-            ),
-          ),
+
+      //Si llegamos aquí, significa que todo está validado
+
+      // 3. Insertar crisis principal
+      final crisis = Crisis(fechaCrisis: fecha, fechaRegistro: DateTime.now());
+      final crisisId = await CrisisDao.insertCrisis(crisis);
+
+      // 4. Insertar detalles fijos
+      for (var detalle in detalles) {
+        await CrisisDetalleDao.insertDetalle(
+          detalle.copyWith(crisisId: crisisId),
         );
-        return;
       }
-      // si todos los campos estan llenos inserto en la DB
+
+      // 5. Insertar detalles dinámicos
       for (var dinamico in dinamicos) {
-        await CrisisDetalleDao.insertDetalle(dinamico);
+        await CrisisDetalleDao.insertDetalle(
+          dinamico.copyWith(crisisId: crisisId),
+        );
       }
-    //muestro mensaje de registro
-      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Crisis registrada correctamente")),
       );
     } finally {
-      if (mounted) setState(() => _isLoading = false); //termina la carga
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

@@ -26,6 +26,20 @@ class CrisisDetalle {
     };
   }
 
+  CrisisDetalle copyWith({
+    int? crisisId,
+    String? horario,
+    String? tipo,
+    int? cantidad,
+  }) {
+    return CrisisDetalle(
+      crisisId: crisisId ?? this.crisisId,
+      horario: horario ?? this.horario,
+      tipo: tipo ?? this.tipo,
+      cantidad: cantidad ?? this.cantidad,
+    );
+  }
+
   factory CrisisDetalle.fromMap(Map<String, dynamic> map) {
     return CrisisDetalle(
       id: map['id'] as int?,
