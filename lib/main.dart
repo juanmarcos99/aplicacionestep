@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         '/paciente': (context) => const PacienteScreen(),
         '/doctor': (context) => const DoctorScreen(),
         '/cambiarcontrasena': (context) => const CambiarContrasenaScreen(),
-        "/registro_crisis": (context) => const RegistroCrisisScreen(),
+        '/registro_crisis': (context) => const RegistroCrisisScreen(),
         "/diario_crisis": (context) => const DiarioCrisisScreen(),
         '/pdf': (context) => const PdfScreen(),
         '/pdfs': (context) => const PdfListScreen(),
